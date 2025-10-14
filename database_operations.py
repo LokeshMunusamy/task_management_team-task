@@ -147,19 +147,14 @@ class Create_operations:
     def sorted_data(user_id):
         db = Database.conn("task_maintain")
 
-        tasks = db.find({"user_id": ObjectId(user_id)}).sort("due_date", ASCENDING)
+        tasks = list(db.find({"user_id": user_id}).sort("due_date", ASCENDING))
 
-        result = []
         for task in tasks:
             task["_id"] = str(task["_id"])
-            result.append(task)
 
-        return {
-            "status": "success",
-            "data": result
-        }
+        return tasks
 
-
+        
     @staticmethod
     def get_profile(user_id):
             print(user_id)
