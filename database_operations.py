@@ -49,6 +49,7 @@ class Create_operations:
         session.permanent = True
         session["token"] = token
         return {"status": "success", "message": "Login successful", "token": token}
+    
 
     @staticmethod
     def new_task(title, description, status, priority, due_date, user_id):
@@ -121,7 +122,6 @@ class Create_operations:
             for val in result:
                 val['_id'] = str(val['_id'])
             return result
-
         
         elif field in ["pending", "complete"]:
             result = list(db.find({"status": field, "user_id": login_id}))
@@ -137,11 +137,6 @@ class Create_operations:
                 "status_code": 401
             }
         
-    # @staticmethod
-    # def sorted_data(user_id):
-    #     db = Database.conn("task_maintain")
-    #     user = db.find({"_id": ObjectId(user_id)}).sort("due_date", ASCENDING)
-    #     return user
 
     @staticmethod
     def sorted_data(user_id):
@@ -157,25 +152,44 @@ class Create_operations:
         
     @staticmethod
     def get_profile(user_id):
-            print(user_id)
+
+        db = Database.conn("users")
+        user = db.find_one({"_id": ObjectId(user_id)})
         
-            db = Database.conn("users")
-            user = db.find_one({"_id": ObjectId(user_id)})
-            
-            if not user:
-                return {"status": "error", "message": "User not found", "status_code": 404}
-        
-            return {
-                "status": "success",
-                "data": {
-                    "profile": {
-                        "id": str(user["_id"]),
-                        "name": user.get("name"),
-                        "email": user.get("email"),
-                        "created_time": user.get("created_time"),
-                        "updated_time": user.get("updated_time")
-                    }
+        if not user:
+            return {"status": "error", "message": "User not found", "status_code": 404}
+    
+        return {
+            "status": "success",
+            "data": {
+                "profile": {
+                    "id": str(user["_id"]),
+                    "name": user.get("name"),
+                    "email": user.get("email"),
+                    "created_time": user.get("created_time"),
+                    "updated_time": user.get("updated_time")
                 }
             }
+        }
+    
+
+    @staticmethod
+    def update_profile(id, name, email, password):
+        db = Database.conn("users")
+        update_data = {
+            "name": name,
+            "email": email,
+            "password": password,
+            "updated_at": datetime.now(timezone.utc)
+        }
+
+        update_data = {k: v for k, v in update_data.items() if v is not None}
+
+        result = db.update_one({"_id": ObjectId(id)}, {"$set": update_data})
+
+        if result.modified_count == 0:
+            return {"status": "error", "message": "No changes made", "status_code": 400}
+
+        return {"status": "success", "message": "user profile updated successfully", "status_code": 200}
     
     

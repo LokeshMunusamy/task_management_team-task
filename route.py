@@ -38,10 +38,6 @@ def login():
     if not token:
 
         result = Create_operations.login_method(email, password)
-        # decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        # id = decoded.get('user_id')
-        # login_id = id
-        # print(login_id)
         return jsonify(result), 200 if result["status"] == "success" else 400
     else:
         return jsonify({"status": "error", "message": "already user login"})
@@ -50,9 +46,8 @@ def login():
 @app.route('/add_task', methods=['POST'])
 @create_task
 def assign_task():
-    # global login_id
+ 
     data = request.get_json()
-
     title = data.get("title")
     description = data.get("description")
     status = data.get("status")
@@ -69,7 +64,6 @@ def assign_task():
         title, description, status, priority, due_date, user_id
     )
     return jsonify(result), 200 if result.get("status") == "success" else 400
-
 
 
 @app.route('/update_task/<task_id>', methods=['PUT'])
@@ -90,7 +84,6 @@ def update_task(task_id):
 
     result = Create_operations.update_task(task_id, title, description, status, priority, due_date, user_id)
     return jsonify(result), result.get("status_code", 200)
-
 
 
 @app.route('/delete_task/<task_id>', methods=['DELETE'])
@@ -115,25 +108,33 @@ def sort_method():
     return jsonify(result)
 
 
-
 @app.route("/profile", methods=["GET"])
-def update_user():
+def get_user():
     id = login_id(session.get("token"))
-    print("route", id)
     result = Create_operations.get_profile(id)
     return jsonify(result)
 
 
+@validate_signup
+@app.route("/profile_update", methods=['PUT'])
+def updete_user():
+    id = login_id(session.get("token"))
+    data = request.get_json()
+    name = data.get('name')
+    email = data.get('email')
+    password = data.get('password')
+
+    result = Create_operations.update_profile(id, name, email, password)
+    return jsonify(result), 200 if result["status"] == "success" else 400
+
 
 @app.route("/get_token", methods=['GET'])
 def get_token():
-    # id = login_id(session.get("token"))
     token = session.get("token")
     if token:
-        # decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        # # print(decoded, id)
         return jsonify({"status": "success", "token": token})
     return jsonify({"status": "error", "message": "No session token found"}), 400
+
 
 @app.route("/remove_session")
 def remove_session():

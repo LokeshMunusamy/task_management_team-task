@@ -53,8 +53,7 @@ def create_task(funs):
         status = data.get("status")
         priority = data.get("priority")
         due_date = data.get("due_date")
-        # user_id = data.get("user_id")
-
+    
         if not title:
             return jsonify({"error": "Title is required"}), 400
 
@@ -70,9 +69,6 @@ def create_task(funs):
 
         if not due_date:
             return jsonify({"error": "Due date is required"}), 400
-
-        # if not user_id:
-        #     return jsonify({"error": "User ID is required"}), 400
 
         return funs(*args, **kwargs)
     return validation
