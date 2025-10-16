@@ -166,8 +166,8 @@ class Create_operations:
                     "id": str(user["_id"]),
                     "name": user.get("name"),
                     "email": user.get("email"),
-                    "created_time": user.get("created_time"),
-                    "updated_time": user.get("updated_time")
+                    "created_at": user.get("created_at"),
+                    "updated_at": user.get("updated_at")
                 }
             }
         }
